@@ -24,12 +24,12 @@ public class MsClientApplication implements CommandLineRunner{
 	public void run(String... args) throws Exception {
 		deleteAllClients();
 		Client client1 = new Client("Cesar", "Gomez", "Lopez");
-		Client client2 = new Client("Diego", "García", "Garay");
+		Client client2 = new Client("Andre", "Lopez", "Gomez");
 		addClient(client1);
 		addClient(client2);
 		findAllClients();
-		System.out.println(findClientByFirstName("Diego"));
-		deleteClient(client2);
+		System.out.println(findClientByFirstName("Andre"));
+		deleteClientById(findClientByFirstName("Andre").getId());
 		findAllClients();
 		
 		Client client3 = findClientByFirstName("Cesar");
@@ -60,9 +60,9 @@ public class MsClientApplication implements CommandLineRunner{
 		return repository.findFirstByFirstName(name);
 	}
 	
-	public void deleteClient(Client client) {
-		System.out.println("Removing Client '" + client.getFirstName() + " " + client.getLastNamePaternal() + "'");
-		repository.delete(client);
+	public void deleteClientById(String id) {
+		System.out.println("Removing Client by Id '" + id + "'");
+		repository.deleteById(id);
 	}
 	
 	public void updateClient(Client client) {
