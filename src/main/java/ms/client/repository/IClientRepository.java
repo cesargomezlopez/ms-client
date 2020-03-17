@@ -1,9 +1,11 @@
 package ms.client.repository;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
-
 import ms.client.model.Client;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
 
-public interface IClientRepository extends MongoRepository<Client, String>{
-	Client findFirstByFirstName(String firstName);
+@Repository
+public interface IClientRepository extends ReactiveMongoRepository<Client, String> {
+  Mono<Client> findFirstByFirstName(String firstName);
 }
