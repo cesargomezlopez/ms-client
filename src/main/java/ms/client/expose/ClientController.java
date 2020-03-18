@@ -1,5 +1,6 @@
 package ms.client.expose;
 
+import javax.validation.Valid;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ms.client.model.Client;
@@ -7,6 +8,8 @@ import ms.client.model.Confirmation;
 import ms.client.service.IClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,14 +59,14 @@ public class ClientController {
     if (!id.isEmpty() && id != null) {
       try {
         clientService.deleteById(id).subscribe();
-        confirmation.setState(1);
+        confirmation.setStatus(1);
         confirmation.setMessage("Client deleted successfully");
       } catch (Exception e) {
-        confirmation.setState(0);
+        confirmation.setStatus(0);
         confirmation.setMessage("Error trying delet client");
       }
     } else {
-      confirmation.setState(-1);
+      confirmation.setStatus(-1);
       confirmation.setMessage("The id client must be different to null");
     }
 
@@ -73,20 +76,23 @@ public class ClientController {
   @PostMapping(value = "/addClient", produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Add a client", notes = "Add a new client", response = Confirmation.class)
-  public Confirmation<Client> addClient(@RequestBody Client client) {
+  public Confirmation<Client> addClient(@Valid @RequestBody Client client, Errors errors) {
     Confirmation<Client> confirmation = new Confirmation<Client>();
-    if (client != null) {
+
+    if (errors.hasErrors()) {
+      System.out.println(errors);
+      confirmation.setStatus(0);
+      confirmation.setMessage("Client data must be complete");
+    }
+    else {
       try {
         confirmation.setModel(clientService.save(client).block());
-        confirmation.setState(1);
+        confirmation.setStatus(1);
         confirmation.setMessage("Client register successfully");
       } catch (Exception e) {
-        confirmation.setState(0);
-        confirmation.setMessage("Error trying register client");
-      }
-    } else {
-      confirmation.setState(-1);
-      confirmation.setMessage("Client data must be complete");
+          confirmation.setStatus(-1);
+          confirmation.setMessage("Error trying register client");
+        }
     }
 
     return confirmation;
@@ -96,21 +102,23 @@ public class ClientController {
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Update a client", notes = "Update a client registered", 
       response = Client.class)
-  public Confirmation<Client> updateClient(@RequestBody Client client) {
+  public Confirmation<Client> updateClient(@Valid @RequestBody Client client, BindingResult result) {
     Confirmation<Client> confirmation = new Confirmation<Client>();
 
-    if (client != null) {
-      try {
-        clientService.save(client).subscribe();
-        confirmation.setState(1);
-        confirmation.setMessage("Client updated successfully");
-      } catch (Exception e) {
-        confirmation.setState(0);
-        confirmation.setMessage("Error trying updating client");
-      }
-    } else {
-      confirmation.setState(-1);
+    if (result.hasErrors()) {
+      System.out.println(result);
+      confirmation.setStatus(0);
       confirmation.setMessage("Client data must be complete");
+    }
+    else {
+      try {
+          confirmation.setModel(clientService.save(client).block());
+          confirmation.setStatus(1);
+          confirmation.setMessage("Client updated successfully");
+      } catch (Exception e) {
+          confirmation.setStatus(-1);
+          confirmation.setMessage("Error trying updating client");
+        }
     }
 
     return confirmation;

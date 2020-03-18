@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class Confirmation<T> {
-  private Integer state;
+  private Integer status;
   private String message;
   private T model;
 
