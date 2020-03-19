@@ -1,5 +1,7 @@
 package ms.client.expose;
 
+import java.net.URI;
+
 import javax.validation.Valid;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -8,8 +10,7 @@ import ms.client.model.Confirmation;
 import ms.client.service.IClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,7 +54,7 @@ public class ClientController {
   @DeleteMapping(value = "/deleteClientById", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Delete client by id", notes = "Delete client registered by id",
       response = Confirmation.class)
-  public Confirmation<Client> deleteClientById(@RequestParam("id")String id) {
+  public Mono<Confirmation<Client>> deleteClientById(@RequestParam("id")String id) {
     Confirmation<Client> confirmation = new Confirmation<Client>();
 
     if (!id.isEmpty() && id != null) {
@@ -70,58 +71,31 @@ public class ClientController {
       confirmation.setMessage("The id client must be different to null");
     }
 
-    return confirmation;
+    return Mono.just(confirmation);
   }
 
   @PostMapping(value = "/addClient", produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "Add a client", notes = "Add a new client", response = Confirmation.class)
-  public Confirmation<Client> addClient(@Valid @RequestBody Client client, Errors errors) {
-    Confirmation<Client> confirmation = new Confirmation<Client>();
-
-    if (errors.hasErrors()) {
-      System.out.println(errors);
-      confirmation.setStatus(0);
-      confirmation.setMessage("Client data must be complete");
-    }
-    else {
-      try {
-        confirmation.setModel(clientService.save(client).block());
-        confirmation.setStatus(1);
-        confirmation.setMessage("Client register successfully");
-      } catch (Exception e) {
-          confirmation.setStatus(-1);
-          confirmation.setMessage("Error trying register client");
-        }
-    }
-
-    return confirmation;
+  @ApiOperation(value = "Add a client", notes = "Add a new client", response = ResponseEntity.class)
+  public Mono<ResponseEntity<Client>> addClient(@Valid @RequestBody Client client) {
+	  return clientService.create(client)
+              .map(c -> ResponseEntity
+                      .created(URI.create("/clients".concat(c.getId())))
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .body(c));
   }
 
   @PutMapping(value = "/updateClient", produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Update a client", notes = "Update a client registered", 
       response = Client.class)
-  public Confirmation<Client> updateClient(@Valid @RequestBody Client client, BindingResult result) {
-    Confirmation<Client> confirmation = new Confirmation<Client>();
-
-    if (result.hasErrors()) {
-      System.out.println(result);
-      confirmation.setStatus(0);
-      confirmation.setMessage("Client data must be complete");
-    }
-    else {
-      try {
-          confirmation.setModel(clientService.save(client).block());
-          confirmation.setStatus(1);
-          confirmation.setMessage("Client updated successfully");
-      } catch (Exception e) {
-          confirmation.setStatus(-1);
-          confirmation.setMessage("Error trying updating client");
-        }
-    }
-
-    return confirmation;
+  public Mono<ResponseEntity<Client>> updateClient(@Valid @RequestBody Client client) {
+	  return clientService.update(client)
+              .map(c -> ResponseEntity
+                      .created(URI.create("/clients".concat(c.getId())))
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .body(c))
+              .defaultIfEmpty(ResponseEntity.notFound().build());
   }
 
 }

@@ -9,7 +9,9 @@ public interface ICRUD<T> {
 
   public Mono<T> findById(String id);
 
-  public Mono<T> save(T t);
+  public Mono<T> create(T t);
+  
+  public Mono<T> update(T t);
 
   public Mono<Void> deleteById(String id);
   
