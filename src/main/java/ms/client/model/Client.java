@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
@@ -55,7 +54,7 @@ public class Client {
   @JsonFormat(pattern = "yyyy-MM-dd")
   private Date endDate;
 
-  @NotNull(message = "Client type can not be null")
-  private Integer clientType;
+  @NotEmpty(message = "Client type can not be empty")
+  private String clientType;
 
 }

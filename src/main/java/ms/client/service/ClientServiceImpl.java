@@ -31,7 +31,7 @@ public class ClientServiceImpl implements IClientService {
   @Override
   public Mono<Void> deleteById(String id) {
     return clientRepository.findById(id).flatMap(client -> {
-    	return clientRepository.delete(client);
+      return clientRepository.delete(client);
     }).switchIfEmpty(Mono.empty());
   }
 
@@ -42,10 +42,14 @@ public class ClientServiceImpl implements IClientService {
   
   @Override
   public Mono<Client> update(Client client) {
-	return clientRepository.findById(client.getId()).flatMap(cl -> {
-		return clientRepository.save(client);
-	}).switchIfEmpty(Mono.empty());
+    return clientRepository.findById(client.getId()).flatMap(cl -> {
+      return clientRepository.save(client);
+    }).switchIfEmpty(Mono.empty());
   }
-
+  
+  @Override
+  public Mono<Boolean> existClient(String id) {
+    return clientRepository.existsById(id);
+  }
 
 }

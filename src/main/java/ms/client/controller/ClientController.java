@@ -1,10 +1,9 @@
-package ms.client.expose;
+package ms.client.controller;
 
-import java.net.URI;
-
-import javax.validation.Valid;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.net.URI;
+import javax.validation.Valid;
 import ms.client.model.Client;
 import ms.client.model.Confirmation;
 import ms.client.service.IClientService;
@@ -24,7 +23,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/client")
-@Api(value = "cliente")
+@Api(value = "client")
 public class ClientController {
 
   @Autowired
@@ -44,11 +43,11 @@ public class ClientController {
     return clientService.findById(id);
   }
 
-  @GetMapping(value = "/findClientByName", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/findClientByFirstName", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Find client by name", notes = "Find client registered by name", 
       response = Client.class)
-  public Mono<Client> findClientByName(@RequestParam("firstName")String firstName) {
-    return clientService.findFirstByFirstName(firstName);
+  public Mono<Client> findClientByFirstName(@RequestParam("firstName")String firstName) {
+    return clientService.findFirstByFirstName(firstName).switchIfEmpty(Mono.empty());
   }
 
   @DeleteMapping(value = "/deleteClientById", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -78,7 +77,7 @@ public class ClientController {
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Add a client", notes = "Add a new client", response = ResponseEntity.class)
   public Mono<ResponseEntity<Client>> addClient(@Valid @RequestBody Client client) {
-	  return clientService.create(client)
+    return clientService.create(client)
               .map(c -> ResponseEntity
                       .created(URI.create("/clients".concat(c.getId())))
                       .contentType(MediaType.APPLICATION_JSON)
@@ -90,12 +89,20 @@ public class ClientController {
   @ApiOperation(value = "Update a client", notes = "Update a client registered", 
       response = Client.class)
   public Mono<ResponseEntity<Client>> updateClient(@Valid @RequestBody Client client) {
-	  return clientService.update(client)
+    return clientService.update(client)
               .map(c -> ResponseEntity
                       .created(URI.create("/clients".concat(c.getId())))
                       .contentType(MediaType.APPLICATION_JSON)
                       .body(c))
               .defaultIfEmpty(ResponseEntity.notFound().build());
+  }
+  
+  
+  @GetMapping(value = "/existClient", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiOperation(value = "Valid the existence of a client", 
+      notes = "Valid the existence of a client registered")
+  public Mono<Boolean> existClient(@RequestParam("id")String id) {
+    return clientService.existClient(id);
   }
 
 }

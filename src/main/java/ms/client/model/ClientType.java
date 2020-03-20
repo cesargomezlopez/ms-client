@@ -1,13 +1,11 @@
 package ms.client.model;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 
 @Data
 @NoArgsConstructor

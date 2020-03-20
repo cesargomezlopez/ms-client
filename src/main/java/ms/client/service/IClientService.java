@@ -5,5 +5,9 @@ import ms.client.util.ICRUD;
 import reactor.core.publisher.Mono;
 
 public interface IClientService extends ICRUD<Client> {
+
   Mono<Client> findFirstByFirstName(String firstName);
+  
+  Mono<Boolean> existClient(String id);
+
 }

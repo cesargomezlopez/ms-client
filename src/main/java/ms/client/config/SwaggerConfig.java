@@ -1,4 +1,4 @@
-package ms.client;
+package ms.client.config;
 
 import java.util.Arrays;
 import java.util.HashSet;
