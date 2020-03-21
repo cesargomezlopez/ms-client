@@ -7,5 +7,5 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface IClientRepository extends ReactiveMongoRepository<Client, String> {
-  Mono<Client> findFirstByFirstName(String firstName);
+  Mono<Client> findFirstByName(String firstName);
 }

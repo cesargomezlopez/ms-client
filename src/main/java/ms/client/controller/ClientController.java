@@ -2,12 +2,12 @@ package ms.client.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import java.net.URI;
 import javax.validation.Valid;
 import ms.client.model.Client;
 import ms.client.model.Confirmation;
 import ms.client.service.IClientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,58 +30,56 @@ public class ClientController {
   private IClientService clientService;
 
   @GetMapping(value = "/findAllClients", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "Find all clients", notes = "Find all clients registered", 
-      response = Client.class)
-  public Flux<Client> findAllClients() {
-    return clientService.findAll();
+  @ApiOperation(value = "Find all clients", notes = "Find all clients registered")
+  public Mono<ResponseEntity<Flux<Client>>> findAllClients() {
+    return Mono.just(ResponseEntity
+      .ok()
+      .contentType(MediaType.APPLICATION_JSON)
+      .body(clientService.findAll()));
   }
 
   @GetMapping(value = "/findClientById", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "Find client by id", notes = "Fin client registered by id", 
-      response = Client.class)
-  public Mono<Client> findClientById(@RequestParam("id")String id) {
-    return clientService.findById(id);
+  @ApiOperation(value = "Find client by id", notes = "Fin client registered by id")
+  public Mono<ResponseEntity<Client>> findClientById(@RequestParam("id")String id) {
+    return clientService.findById(id).flatMap(c -> {
+      return Mono.just(ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(c));
+    }).defaultIfEmpty(ResponseEntity.notFound().build());
   }
 
-  @GetMapping(value = "/findClientByFirstName", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/findClientByName", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Find client by name", notes = "Find client registered by name", 
       response = Client.class)
-  public Mono<Client> findClientByFirstName(@RequestParam("firstName")String firstName) {
-    return clientService.findFirstByFirstName(firstName).switchIfEmpty(Mono.empty());
+  public Mono<ResponseEntity<Client>> findClientByName(@RequestParam("name")String name) {
+    return clientService.findFirstByName(name).flatMap(c -> {
+      return Mono.just(ResponseEntity
+        .ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(c));
+    }).defaultIfEmpty(ResponseEntity.notFound().build());
   }
 
   @DeleteMapping(value = "/deleteClientById", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Delete client by id", notes = "Delete client registered by id",
       response = Confirmation.class)
-  public Mono<Confirmation<Client>> deleteClientById(@RequestParam("id")String id) {
-    Confirmation<Client> confirmation = new Confirmation<Client>();
-
-    if (!id.isEmpty() && id != null) {
-      try {
-        clientService.deleteById(id).subscribe();
-        confirmation.setStatus(1);
-        confirmation.setMessage("Client deleted successfully");
-      } catch (Exception e) {
-        confirmation.setStatus(0);
-        confirmation.setMessage("Error trying delet client");
-      }
-    } else {
-      confirmation.setStatus(-1);
-      confirmation.setMessage("The id client must be different to null");
-    }
-
-    return Mono.just(confirmation);
+  public Mono<ResponseEntity<Void>> deleteClientById(@RequestParam("id")String id) {
+    return clientService.deleteById(id)
+      .then(Mono.just(new ResponseEntity<Void>(HttpStatus.NO_CONTENT)))
+      .defaultIfEmpty(ResponseEntity.notFound().build());
   }
 
-  @PostMapping(value = "/addClient", produces = MediaType.APPLICATION_JSON_VALUE,
+  @PostMapping(value = "/createClient", produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "Add a client", notes = "Add a new client", response = ResponseEntity.class)
-  public Mono<ResponseEntity<Client>> addClient(@Valid @RequestBody Client client) {
+  @ApiOperation(value = "Create a client", notes = "Add a new client",
+      response = ResponseEntity.class)
+  public Mono<ResponseEntity<Client>> createClient(@Valid @RequestBody Client client) {
     return clientService.create(client)
-              .map(c -> ResponseEntity
-                      .created(URI.create("/clients".concat(c.getId())))
+              .flatMap(c -> {
+                return Mono.just(ResponseEntity.ok()
                       .contentType(MediaType.APPLICATION_JSON)
                       .body(c));
+              }).defaultIfEmpty(ResponseEntity.notFound().build());
   }
 
   @PutMapping(value = "/updateClient", produces = MediaType.APPLICATION_JSON_VALUE,
@@ -90,19 +88,13 @@ public class ClientController {
       response = Client.class)
   public Mono<ResponseEntity<Client>> updateClient(@Valid @RequestBody Client client) {
     return clientService.update(client)
-              .map(c -> ResponseEntity
-                      .created(URI.create("/clients".concat(c.getId())))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .body(c))
+              .flatMap(c -> {
+                return Mono.just(ResponseEntity
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(c));
+              })
               .defaultIfEmpty(ResponseEntity.notFound().build());
-  }
-  
-  
-  @GetMapping(value = "/existClient", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "Valid the existence of a client", 
-      notes = "Valid the existence of a client registered")
-  public Mono<Boolean> existClient(@RequestParam("id")String id) {
-    return clientService.existClient(id);
   }
 
 }

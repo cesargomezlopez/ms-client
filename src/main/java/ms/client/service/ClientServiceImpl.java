@@ -20,12 +20,14 @@ public class ClientServiceImpl implements IClientService {
 
   @Override
   public Mono<Client> findById(String id) {
-    return clientRepository.findById(id);
+    return clientRepository.findById(id)
+      .switchIfEmpty(Mono.empty());
   }
   
   @Override
-  public Mono<Client> findFirstByFirstName(String firstName) {
-    return clientRepository.findFirstByFirstName(firstName);
+  public Mono<Client> findFirstByName(String firstName) {
+    return clientRepository.findFirstByName(firstName)
+      .switchIfEmpty(Mono.empty());
   }
   
   @Override
@@ -36,20 +38,17 @@ public class ClientServiceImpl implements IClientService {
   }
 
   @Override
-  public Mono<Client> create(Client client) {
-    return clientRepository.save(client);
+  public Mono<Client> create(Client entity) {
+    return clientRepository.save(entity)
+      .switchIfEmpty(Mono.empty());
   }
   
   @Override
-  public Mono<Client> update(Client client) {
-    return clientRepository.findById(client.getId()).flatMap(cl -> {
-      return clientRepository.save(client);
-    }).switchIfEmpty(Mono.empty());
-  }
-  
-  @Override
-  public Mono<Boolean> existClient(String id) {
-    return clientRepository.existsById(id);
+  public Mono<Client> update(Client entity) {
+    return clientRepository.findById(entity.getId())
+      .flatMap(cl -> {
+        return clientRepository.save(entity);
+      }).switchIfEmpty(Mono.empty());
   }
 
 }

@@ -16,10 +16,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+  // error handle for @Valid
   @Override
-  protected ResponseEntity<Object> handleMethodArgumentNotValid(
-      MethodArgumentNotValidException ex, HttpHeaders headers,
-      HttpStatus status, WebRequest request) {
+  protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+      HttpHeaders headers, HttpStatus status, WebRequest request) {
 
     Map<String, Object> body = new LinkedHashMap<>();
     body.put("timestamp", new Date());
@@ -36,4 +36,5 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     return new ResponseEntity<>(body, headers, status);
   }
+
 }

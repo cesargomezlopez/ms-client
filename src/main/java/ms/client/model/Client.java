@@ -2,12 +2,14 @@ package ms.client.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @NoArgsConstructor
@@ -19,20 +21,25 @@ public class Client {
   @Generated
   private String id;
 
-  @NotEmpty(message = "First name can not be empty")
-  private String firstName;
+  @NotEmpty(message = "Client code can not be empty")
+  private String code;
 
-  @NotEmpty(message = "Last name paternal can not be empty")
+  @NotEmpty(message = "Client name can not be empty")
+  private String name;
+
   private String lastNamePaternal;
 
   private String lastNameMaternal;
 
-  @NotEmpty(message = "Email can not be empty")
-  @Email(message = "Enter valid email")
-  private String email;
+  @NotEmpty(message = "Document number can not be empty")
+  private String documentNumber;
 
   @NotEmpty(message = "Phone number can not be empty")
   private String phoneNumber;
+
+  @NotEmpty(message = "Email can not be empty")
+  @Email(message = "Enter valid email")
+  private String email;
 
   @NotEmpty(message = "Address can not be empty")
   private String address;
@@ -40,21 +47,11 @@ public class Client {
   @NotEmpty(message = "City can not be empty")
   private String city;
 
-  private String gender;
-
-  @JsonFormat(pattern = "yyyy-MM-dd")
-  private Date bornDate;
-
   @JsonFormat(pattern = "yyyy-MM-dd")
   private Date startDate;
 
-  @JsonFormat(pattern = "yyyy-MM-dd")
-  private Date editDate;
-
-  @JsonFormat(pattern = "yyyy-MM-dd")
-  private Date endDate;
-
-  @NotEmpty(message = "Client type can not be empty")
-  private String clientType;
+  @Valid
+  @DBRef
+  private ClientType clientType;
 
 }

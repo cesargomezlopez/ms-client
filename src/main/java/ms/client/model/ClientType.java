@@ -15,7 +15,11 @@ public class ClientType {
   @Id
   @Generated
   private String id;
-  @NotEmpty(message = "Description can not be empty")
+
+  @NotEmpty(message = "Client type code can not be empty")
+  private String code;
+
+  @NotEmpty(message = "Client type description can not be empty")
   private String description;
 
 }

@@ -1,13 +1,11 @@
 package ms.client.service;
 
 import ms.client.model.Client;
-import ms.client.util.ICRUD;
+import ms.client.util.ICrud;
 import reactor.core.publisher.Mono;
 
-public interface IClientService extends ICRUD<Client> {
+public interface IClientService extends ICrud<Client,String> {
 
-  Mono<Client> findFirstByFirstName(String firstName);
-  
-  Mono<Boolean> existClient(String id);
+  Mono<Client> findFirstByName(String firstName);
 
 }
