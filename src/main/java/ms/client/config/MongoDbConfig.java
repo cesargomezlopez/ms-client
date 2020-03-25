@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
-public class MongoDBConfig {
+public class MongoDbConfig {
 
   @Autowired
   private MongoDbFactory mongoDbFactory;

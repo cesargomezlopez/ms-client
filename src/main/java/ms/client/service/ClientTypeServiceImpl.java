@@ -4,12 +4,11 @@ import ms.client.model.ClientType;
 import ms.client.repository.IClientTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-public class TypeClientServiceImpl implements IClientTypeService {
+public class ClientTypeServiceImpl implements IClientTypeService {
 
   @Autowired
   private IClientTypeRepository clientTypeRepository;

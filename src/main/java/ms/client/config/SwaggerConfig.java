@@ -14,6 +14,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
+
   public static final Contact DEFAULT_CONTACT = new Contact(
         "César Gómez López", "https://github.com/cesargomezlopez/ms-client.git",
         "cesar.andre.liroy.gomez.lopez@everis.com");
@@ -33,4 +34,5 @@ public class SwaggerConfig {
             .produces(DEFAULT_PRODUCES_AND_CONSUMES)
             .consumes(DEFAULT_PRODUCES_AND_CONSUMES);
   }
+
 }
